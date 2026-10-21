@@ -33,7 +33,7 @@ if (!rawConfig || !rawVendor) {
 const config: SandboxConfig = rawConfig;
 const vendor: VendorBundle = rawVendor;
 
-const React = vendor.React;
+const ReactRuntime = vendor.React;
 const ReactDOMClient = vendor.ReactDOMClient;
 const previewStyles = document.createElement("style");
 previewStyles.nonce = config.nonce;
@@ -160,9 +160,9 @@ function toReactValue(value: unknown): unknown {
     if (typeof record.__element === "string") {
       const elementProps = record.props ? Object.fromEntries(Object.entries(record.props as Record<string, unknown>).map(([key, child]) => [key, toReactValue(child)])) : undefined;
       if ("children" in record) {
-        return React.createElement(record.__element, elementProps, toReactValue(record.children));
+        return ReactRuntime.createElement(record.__element, elementProps, toReactValue(record.children));
       }
-      return React.createElement(record.__element, elementProps);
+      return ReactRuntime.createElement(record.__element, elementProps);
     }
     return Object.fromEntries(Object.entries(record).map(([key, child]) => [key, toReactValue(child)]));
   }
@@ -206,7 +206,7 @@ function renderComponent(component: unknown, props: unknown): void {
     onRecoverableError: (error: unknown) => reportRuntimeError(error, "Recoverable render error."),
   });
 
-  root.render(React.createElement(component as any, Object.fromEntries(Object.entries((props ?? {}) as Record<string, unknown>).map(([key, value]) => [key, toReactValue(value)]))));
+  root.render(ReactRuntime.createElement(component as any, Object.fromEntries(Object.entries((props ?? {}) as Record<string, unknown>).map(([key, value]) => [key, toReactValue(value)]))));
 
   setTimeout(() => {
     if (currentRender === renderCounter) {
